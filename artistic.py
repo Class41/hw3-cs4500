@@ -1,4 +1,5 @@
 import turtle
+import random
 
 SCREEN_SIZE = 750
 
@@ -60,13 +61,13 @@ def setupTurtle():
 
 def drawGrid(turt, N):
     turt.speed("fast")
-    
+
     gridlineIncrement = SCREEN_SIZE / N
     turt.goto(SCREEN_SIZE, 0)
     turt.goto(SCREEN_SIZE, SCREEN_SIZE)
     turt.goto(0, SCREEN_SIZE)
     turt.goto(0, 0)
-    
+
     for i in range(1, N):
         turt.penup()
         if i % 2 == 1:
@@ -77,7 +78,7 @@ def drawGrid(turt, N):
             turt.goto(gridlineIncrement * i, SCREEN_SIZE)
             turt.pendown()
             turt.goto(gridlineIncrement * i, 0)
-            
+
     for i in range(1, N):
         turt.penup()
         if i % 2 == 1:
@@ -85,14 +86,37 @@ def drawGrid(turt, N):
             turt.pendown()
             turt.goto(SCREEN_SIZE, gridlineIncrement * i)
         else:
-            turt.goto(SCREEN_SIZE, gridlineIncrement * i)            
+            turt.goto(SCREEN_SIZE, gridlineIncrement * i)
             turt.pendown()
             turt.goto(0, gridlineIncrement * i)
-    
+
     turt.penup()
-    turt.goto(0,0)
+    turt.goto(0, 0)
     turt.pendown()
     turt.speed("normal")
+
+
+def gotoGridCoordCenter(turt, N, xcoord, ycoord):
+    gridlineIncrement = SCREEN_SIZE / N
+    turt.penup()
+    turt.goto(
+        (gridlineIncrement * xcoord) - (gridlineIncrement / 2),
+        (gridlineIncrement * ycoord) - (gridlineIncrement / 2),
+    )
+    turt.pendown()
+
+
+def getGridCoordConstraints(turt, N, xcoord, ycoord):
+    gridlineIncrement = SCREEN_SIZE / N
+    xcenter = (gridlineIncrement * xcoord) - (gridlineIncrement / 2)
+    ycenter = (gridlineIncrement * ycoord) - (gridlineIncrement / 2)
+
+    xmin = int(xcenter - (gridlineIncrement / 2))
+    xmax = int(xcenter + (gridlineIncrement / 2))
+    ymin = int(ycenter - (gridlineIncrement / 2))
+    ymax = int(ycenter + (gridlineIncrement / 2))
+
+    return [xmin, xmax, ymin, ymax]
 
 
 def startApp():
@@ -100,6 +124,18 @@ def startApp():
     numPaintings = getNumPaintings()
     turt = setupTurtle()
     drawGrid(turt, N)
+    
+    constraints = getGridCoordConstraints(turt, N, 2, 2)
+    
+    for i in range(0,5):
+        xcord = random.randint(int(constraints[0]), int(constraints[1]))
+        ycord = random.randint(int(constraints[2]), int(constraints[3]))
+        
+        turt.penup()
+        turt.goto(xcord, ycord)
+        turt.pendown()
+        turt.shape("circle")
+    
     input()
 
 
