@@ -2,6 +2,7 @@ import turtle
 
 SCREEN_SIZE = 750
 
+
 def getDimensions():
     valid = False
     N = -1
@@ -23,12 +24,13 @@ def getDimensions():
 
     return N
 
+
 def getNumPaintings():
     valid = False
     N = -1
 
     print("Select a number of paintings to be completed by ze artist")
-    
+
     while not valid:
         N = input("Please enter an integer between 1 and 10 inclusive: ")
 
@@ -44,6 +46,7 @@ def getNumPaintings():
 
     return N
 
+
 def setupTurtle():
     turtle.setup(SCREEN_SIZE, SCREEN_SIZE)
     turtle.setworldcoordinates(0, 760, 760, 0)
@@ -51,27 +54,45 @@ def setupTurtle():
     screen.register_shape("blob.gif")
 
     return turtle.Turtle()
-    #t.shape("blob.gif")
-    #screen.mainloop()
+    # t.shape("blob.gif")
+    # screen.mainloop()
+
 
 def drawGrid(turt, N):
-   gridlineIncrement = SCREEN_SIZE / N
-   turt.goto(SCREEN_SIZE, 0)
-   turt.goto(SCREEN_SIZE, SCREEN_SIZE)
-   turt.goto(0, SCREEN_SIZE)
-   turt.goto(0,0)
-
-   for i in range(1, N):
-       turt.penup()
-       turt.goto(gridlineIncrement * i, 0)
-       turt.pendown()
-       turt.goto(gridlineIncrement * i, SCREEN_SIZE)
+    turt.speed("fast")
     
-   for i in range(1, N):
-       turt.penup()
-       turt.goto(0, gridlineIncrement * i)
-       turt.pendown()
-       turt.goto(SCREEN_SIZE, gridlineIncrement * i)
+    gridlineIncrement = SCREEN_SIZE / N
+    turt.goto(SCREEN_SIZE, 0)
+    turt.goto(SCREEN_SIZE, SCREEN_SIZE)
+    turt.goto(0, SCREEN_SIZE)
+    turt.goto(0, 0)
+    
+    for i in range(1, N):
+        turt.penup()
+        if i % 2 == 1:
+            turt.goto(gridlineIncrement * i, 0)
+            turt.pendown()
+            turt.goto(gridlineIncrement * i, SCREEN_SIZE)
+        else:
+            turt.goto(gridlineIncrement * i, SCREEN_SIZE)
+            turt.pendown()
+            turt.goto(gridlineIncrement * i, 0)
+            
+    for i in range(1, N):
+        turt.penup()
+        if i % 2 == 1:
+            turt.goto(0, gridlineIncrement * i)
+            turt.pendown()
+            turt.goto(SCREEN_SIZE, gridlineIncrement * i)
+        else:
+            turt.goto(SCREEN_SIZE, gridlineIncrement * i)            
+            turt.pendown()
+            turt.goto(0, gridlineIncrement * i)
+    
+    turt.penup()
+    turt.goto(0,0)
+    turt.pendown()
+    turt.speed("normal")
 
 
 def startApp():
