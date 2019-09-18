@@ -1,5 +1,7 @@
 import turtle
 
+SCREEN_SIZE = 750
+
 def getDimensions():
     valid = False
     N = -1
@@ -43,20 +45,41 @@ def getNumPaintings():
     return N
 
 def setupTurtle():
+    turtle.setup(SCREEN_SIZE, SCREEN_SIZE)
+    turtle.setworldcoordinates(0, 760, 760, 0)
     screen = turtle.Screen()
     screen.register_shape("blob.gif")
 
-
-    t = turtle.Turtle()
-    t.turtlesize(50, 50, None)
-    t.shape("blob.gif")
-
+    return turtle.Turtle()
+    #t.shape("blob.gif")
     #screen.mainloop()
 
+def drawGrid(turt, N):
+   gridlineIncrement = SCREEN_SIZE / N
+   turt.goto(SCREEN_SIZE, 0)
+   turt.goto(SCREEN_SIZE, SCREEN_SIZE)
+   turt.goto(0, SCREEN_SIZE)
+   turt.goto(0,0)
+
+   for i in range(1, N):
+       turt.penup()
+       turt.goto(gridlineIncrement * i, 0)
+       turt.pendown()
+       turt.goto(gridlineIncrement * i, SCREEN_SIZE)
+    
+   for i in range(1, N):
+       turt.penup()
+       turt.goto(0, gridlineIncrement * i)
+       turt.pendown()
+       turt.goto(SCREEN_SIZE, gridlineIncrement * i)
+
+
 def startApp():
-    setupTurtle()
-    getDimensions()
-    getNumPaintings()
+    N = getDimensions()
+    numPaintings = getNumPaintings()
+    turt = setupTurtle()
+    drawGrid(turt, N)
+    input()
 
 
 if __name__ == "__main__":
