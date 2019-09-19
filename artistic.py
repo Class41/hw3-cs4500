@@ -1,7 +1,7 @@
 import turtle
 import random
 
-SCREEN_SIZE = 750
+SCREEN_SIZE = 500
 
 
 def getDimensions():
@@ -50,7 +50,7 @@ def getNumPaintings():
 
 def setupTurtle():
     turtle.setup(SCREEN_SIZE, SCREEN_SIZE)
-    turtle.setworldcoordinates(0, 760, 760, 0)
+    turtle.setworldcoordinates(0, SCREEN_SIZE + 10, SCREEN_SIZE + 10, 0)
     screen = turtle.Screen()
     screen.register_shape("blob.gif")
 
@@ -124,18 +124,21 @@ def startApp():
     numPaintings = getNumPaintings()
     turt = setupTurtle()
     drawGrid(turt, N)
-    
-    constraints = getGridCoordConstraints(turt, N, 2, 2)
-    
-    for i in range(0,5):
-        xcord = random.randint(int(constraints[0]), int(constraints[1]))
-        ycord = random.randint(int(constraints[2]), int(constraints[3]))
         
-        turt.penup()
-        turt.goto(xcord, ycord)
-        turt.pendown()
-        turt.shape("circle")
-    
+    for k in range(1, N + 1):
+        for j in range (1, N + 1): 
+            constraints = getGridCoordConstraints(turt, N, k, j)
+            turt.speed("fastest")
+            radius = 8
+            for i in range(0,3):
+                xcord = random.randint(int(constraints[0]) + radius, int(constraints[1]) - radius)
+                ycord = random.randint(int(constraints[2]), int(constraints[3]) - (2*radius))
+                
+                turt.penup()
+                turt.goto(xcord, ycord)
+                turt.pendown()
+                turt.circle(radius)
+        
     input()
 
 
