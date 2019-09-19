@@ -135,25 +135,38 @@ def higlightGridSquare(turt, N, xcoord, ycoord, color):
 
     turt.color(originalColor[0])
 
-def createArt(turt, N, colorset):
-    Matrix = [[0 for x in range(N)] for y in range(N)]
-    
-    for k in range(1, N + 1):
-        for j in range (1, N + 1): 
-            constraints = getGridCoordConstraints(turt, N, k, j)
-            turt.speed("fastest")
-            radius = int(SCREEN_SIZE / (N*4))
-            for i in range(0,3):
-                xcord = random.randint(int(constraints[0]) + radius, int(constraints[1]) - radius)
-                ycord = random.randint(int(constraints[2]), int(constraints[3]) - (2*radius))
-                
-                turt.penup()
-                turt.goto(xcord, ycord)
-                turt.pendown()
-                turt.begin_fill()
-                turt.circle(radius)
-                turt.end_fill()
+def verifyCoverage(matrix, N):
+    for i in range(0, N):
+        for j in range (0, N):
+            if matrix[i][j] == 0:
+                return False
+    return True
 
+def createArt(turt, N, colorset):
+    colored = [[0 for x in range(N)] for y in range(N)]
+    coloredCount = [[0 for x in range(N)] for y in range(N)]
+    
+    while verifyCoverage(colored, N) == False:
+        k = random.randint(1, N)
+        j = random.randint(1, N)
+        
+        constraints = getGridCoordConstraints(turt, N, k, j)
+        turt.speed("fastest")
+        radius = int(SCREEN_SIZE / (N*6))
+        
+        xcord = random.randint(int(constraints[0]) + radius, int(constraints[1]) - radius)
+        ycord = random.randint(int(constraints[2]), int(constraints[3]) - (2*radius))
+        
+        turt.color(list(colorset.values())[3 + random.randint(0, 2)])
+        
+        turt.penup()
+        turt.goto(xcord, ycord)
+        turt.pendown()
+        turt.begin_fill()
+        turt.circle(radius)
+        turt.end_fill()
+        colored[k - 1][j - 1] = 1
+        coloredCount[k - 1][j - 1] = coloredCount[k - 1][j - 1] + 1
 
 def startApp():
     
