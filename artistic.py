@@ -53,6 +53,7 @@ def setupTurtle():
     turtle.setworldcoordinates(0, SCREEN_SIZE + 10, SCREEN_SIZE + 10, 0)
     screen = turtle.Screen()
     screen.register_shape("blob.gif")
+    screen.delay(0)
 
     return turtle.Turtle()
     # t.shape("blob.gif")
@@ -151,7 +152,10 @@ def createArt(turt, N, colorset):
         j = random.randint(1, N)
         
         constraints = getGridCoordConstraints(turt, N, k, j)
+        
         turt.speed("fastest")
+        turt.ht()
+        
         radius = int(SCREEN_SIZE / (N*6))
         
         xcord = random.randint(int(constraints[0]) + radius, int(constraints[1]) - radius)
