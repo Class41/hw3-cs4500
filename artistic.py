@@ -118,18 +118,31 @@ def getGridCoordConstraints(turt, N, xcoord, ycoord):
 
     return [xmin, xmax, ymin, ymax]
 
+def higlightGridSquare(turt, N, xcoord, ycoord, color):
+    gridlineIncrement = SCREEN_SIZE / N
+    
+    originalColor = turt.color()
+    
+    turt.color(color)
+    turt.penup()
+    turt.goto(gridlineIncrement * xcoord, gridlineIncrement * ycoord)
+    turt.pendown()
+    
+    turt.goto((2 * gridlineIncrement) * xcoord, gridlineIncrement * ycoord)
+    turt.goto((2 * gridlineIncrement) * xcoord, (2 * gridlineIncrement) * ycoord)
+    turt.goto(gridlineIncrement * xcoord, (2 * gridlineIncrement) * ycoord)
+    turt.goto(gridlineIncrement * xcoord, gridlineIncrement * ycoord)
 
-def startApp():
-    N = getDimensions()
-    numPaintings = getNumPaintings()
-    turt = setupTurtle()
-    drawGrid(turt, N)
-        
+    turt.color(originalColor[0])
+
+def createArt(turt, N, colorset):
+    Matrix = [[0 for x in range(N)] for y in range(N)]
+    
     for k in range(1, N + 1):
         for j in range (1, N + 1): 
             constraints = getGridCoordConstraints(turt, N, k, j)
             turt.speed("fastest")
-            radius = 8
+            radius = int(SCREEN_SIZE / (N*4))
             for i in range(0,3):
                 xcord = random.randint(int(constraints[0]) + radius, int(constraints[1]) - radius)
                 ycord = random.randint(int(constraints[2]), int(constraints[3]) - (2*radius))
@@ -137,8 +150,28 @@ def startApp():
                 turt.penup()
                 turt.goto(xcord, ycord)
                 turt.pendown()
+                turt.begin_fill()
                 turt.circle(radius)
-        
+                turt.end_fill()
+
+
+def startApp():
+    
+    colorset = {
+        "unpainted":"#ff0000",
+        "painted":"#000000",
+        "painting":"#ff00bf",
+        "color1":"#42b0ff",
+        "color2":"#adddff",
+        "color3":"#2b77ad"
+    }
+    
+    N = getDimensions()
+    numPaintings = getNumPaintings()
+    turt = setupTurtle()
+    drawGrid(turt, N)
+    createArt(turt, N, colorset)
+
     input()
 
 
