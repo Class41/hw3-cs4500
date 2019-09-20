@@ -52,7 +52,7 @@ def setupTurtle():
     turtle.setup(SCREEN_SIZE, SCREEN_SIZE)
     turtle.setworldcoordinates(0, SCREEN_SIZE + 10, SCREEN_SIZE + 10, 0)
     screen = turtle.Screen()
-    screen.delay(0)
+    screen.delay(30)
     screen.bgcolor("black")
 
     return turtle.Turtle()
@@ -136,13 +136,10 @@ def higlightGridSquare(turt, N, xcoord, ycoord, color):
 
     turt.color(originalColor[0])
 
-def colorizeCoverage(turt, N, matrix, paintstates, colorset):    
+def colorizeCoverage(turt, N, matrix, paintstates, colorset):                    
     for i in range(0, N):
         for j in range (0, N):
-            if matrix[i][j] == 1 and (paintstates[i][j] == 0 or paintstates[i][j] == 2):
-                higlightGridSquare(turt, N, i, j, colorset["painted"])
-                paintstates[i][j] = 1
-            elif matrix[i][j] == 0 and paintstates[i][j] == 2:
+            if matrix[i][j] == 0 and paintstates[i][j] == 2:
                 higlightGridSquare(turt, N, i, j, colorset["unpainted"])
                 paintstates[i][j] = 0
     
@@ -165,6 +162,7 @@ def updateMatrixCross(N, paintstates, xcoord, ycoord):
     if ycoord - 1 >= 0:
         paintstates[xcoord][ycoord - 1] = 2
         
+    print(str(paintstates).replace("],", "\n", -1))
     return paintstates
 
 def createArt(turt, N, colorset):
@@ -177,13 +175,13 @@ def createArt(turt, N, colorset):
         j = random.randint(1, N)
         
         colorizeCoverage(turt, N, colored, paintstates, colorset)
-        paintstates = updateMatrixCross(N, paintstates, k - 1, j - 1)        
         higlightGridSquare(turt, N, k - 1, j - 1, colorset["painting"])
+        paintstates = updateMatrixCross(N, paintstates, k - 1, j - 1)        
 
         constraints = getGridCoordConstraints(turt, N, k, j)
         
-        turt.speed("fastest")
-        turt.ht()
+        turt.speed("fast")
+        #turt.ht()
         
         radius = int(SCREEN_SIZE / (N*5))
         
@@ -200,6 +198,7 @@ def createArt(turt, N, colorset):
         turt.end_fill()
         colored[k - 1][j - 1] = 1
         coloredcount[k - 1][j - 1] = coloredcount[k - 1][j - 1] + 1
+        higlightGridSquare(turt, N, k - 1, j - 1, colorset["painted"])
     
     colorizeCoverage(turt, N, colored, paintstates, colorset)
 
