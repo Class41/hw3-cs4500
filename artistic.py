@@ -144,8 +144,9 @@ def colorizeCoverage(turt, N, matrix, paintstates, colorset):
             if matrix[i][j] == 1 and paintstates[i][j] == 0:
                 higlightGridSquare(turt, N, i, j, colorset["painted"])
                 paintstates[i][j] = 1
-            elif matrix[i][j] == 0:
+            elif matrix[i][j] == 0 and paintstates[i][j] == 2:
                 higlightGridSquare(turt, N, i, j, colorset["unpainted"])
+                paintstates[i][j] = 0
     
     turt.speed(turtoriginalspeed)
 
@@ -155,6 +156,20 @@ def verifyCoverage(matrix, N):
             if matrix[i][j] == 0:
                 return False
     return True
+
+def updateMatrixCross(N, paintstates, xcoord, ycoord):
+    paintstates[xcoord - 1][ycoord - 1] = 0
+    
+    if xcoord < N:
+        paintstates[xcoord][ycoord - 1] = 2
+    if xcoord - 2 >= 0:
+        paintstates[xcoord - 2][ycoord - 1] = 2
+    if ycoord < N:
+        paintstates[xcoord - 1][ycoord] = 2
+    if ycoord - 2 >= 0:
+        paintstates[xcoord - 1][ycoord - 2] = 2
+    
+    return paintstates
 
 def createArt(turt, N, colorset):
     colored = [[0 for x in range(N)] for y in range(N)]
@@ -166,9 +181,9 @@ def createArt(turt, N, colorset):
         j = random.randint(1, N)
         
         colorizeCoverage(turt, N, colored, paintstates, colorset)
-        paintstates[k - 1][j - 1] = 0
+        paintstates = updateMatrixCross(N, paintstates, k, j)        
         higlightGridSquare(turt, N, k - 1, j - 1, colorset["painting"])
-        
+
         constraints = getGridCoordConstraints(turt, N, k, j)
         
         turt.speed("fastest")
