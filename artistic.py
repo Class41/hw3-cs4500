@@ -3,7 +3,6 @@ import random
 
 SCREEN_SIZE = 500
 
-
 def getDimensions():
     valid = False
     N = -1
@@ -53,6 +52,7 @@ def setupTurtle():
     turtle.setworldcoordinates(0, SCREEN_SIZE + 10, SCREEN_SIZE + 10, 0)
     screen = turtle.Screen()
     screen.delay(0)
+    screen.reset()
     screen.bgcolor("black")
 
     return turtle.Turtle()
@@ -135,14 +135,11 @@ def higlightGridSquare(turt, N, xcoord, ycoord, color):
 
     turt.color(originalColor[0])
 
-def colorizeCoverage(turt, N, matrix, paintstates, colorset): 
+def colorizeCoverage(turt, N, matrix, paintstates, colorset):                                    
     for i in range(0, N):
         for j in range (0, N):
             if matrix[i][j] == 1 and paintstates[i][j] == 2:
                 paintstates[i][j] = 1
-                                   
-    for i in range(0, N):
-        for j in range (0, N):
             if matrix[i][j] == 0 and paintstates[i][j] == 2:
                 higlightGridSquare(turt, N, i, j, colorset["unpainted"])
                 paintstates[i][j] = 0
@@ -204,7 +201,22 @@ def createArt(turt, N, colorset):
         higlightGridSquare(turt, N, k - 1, j - 1, colorset["painted"])
     
     colorizeCoverage(turt, N, colored, paintstates, colorset)
+    return coloredcount
 
+def gatherArtStatistics(resultset, results, N):
+    cell_min = 99999
+    cell_max = 0
+    cell_avg = 0
+    
+    for i in range(0, N):
+        for j in range (0, N):
+            cell_avg = cell_avg = results[i][j]
+            if results[i][j] < cell_min:
+                cell_min = results[i][j]
+            if results[i][j] > cell_min:
+                cell_max = results[i][j]
+    
+    cell_avg = cell_avg / (N * N)
 
 def startApp():
     
@@ -217,13 +229,24 @@ def startApp():
         "color3":"#ffb142"
     }
     
+    resultset = {
+        "art_min":0,
+        "art_max": 0,
+        "art_avg": 0,
+        "cell_min": 0,
+        "cell_max": 0,
+        "cell_avg": 0
+    }
+    
     N = getDimensions()
     numPaintings = getNumPaintings()
-    turt = setupTurtle()
-    drawGrid(turt, N, colorset["unpainted"])
-    createArt(turt, N, colorset)
-
-    input()
+    
+    for i in range(0, numPaintings):
+        turt = setupTurtle()
+        drawGrid(turt, N, colorset["unpainted"])
+        results = createArt(turt, N, colorset)
+        resultset = gatherArtStatistics(resultset, results, N)
+        input()
 
 
 if __name__ == "__main__":
