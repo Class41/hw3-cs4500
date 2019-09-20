@@ -60,7 +60,6 @@ def setupTurtle():
 
 def drawGrid(turt, N, color):
     turt.speed("fast")
-
     turt.color(color)
 
     gridlineIncrement = SCREEN_SIZE / N
@@ -136,7 +135,12 @@ def higlightGridSquare(turt, N, xcoord, ycoord, color):
 
     turt.color(originalColor[0])
 
-def colorizeCoverage(turt, N, matrix, paintstates, colorset):                    
+def colorizeCoverage(turt, N, matrix, paintstates, colorset): 
+    for i in range(0, N):
+        for j in range (0, N):
+            if matrix[i][j] == 1 and paintstates[i][j] == 2:
+                paintstates[i][j] = 1
+                                   
     for i in range(0, N):
         for j in range (0, N):
             if matrix[i][j] == 0 and paintstates[i][j] == 2:
@@ -151,7 +155,7 @@ def verifyCoverage(matrix, N):
     return True
 
 def updateMatrixCross(N, paintstates, xcoord, ycoord):
-    paintstates[xcoord][ycoord] = 2
+    paintstates[xcoord][ycoord] = 1
     
     if xcoord + 1 < N:
         paintstates[xcoord + 1][ycoord] = 2
@@ -162,7 +166,6 @@ def updateMatrixCross(N, paintstates, xcoord, ycoord):
     if ycoord - 1 >= 0:
         paintstates[xcoord][ycoord - 1] = 2
         
-    print(str(paintstates).replace("],", "\n", -1))
     return paintstates
 
 def createArt(turt, N, colorset):
@@ -219,10 +222,6 @@ def startApp():
     turt = setupTurtle()
     drawGrid(turt, N, colorset["unpainted"])
     createArt(turt, N, colorset)
-    
-    #states = updateMatrixCross(N, [[0 for x in range(N)] for y in range(N)], 3, 3)
-    #print(str(states).replace("],", "\n", -1))
-    
 
     input()
 
