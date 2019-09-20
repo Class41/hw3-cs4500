@@ -52,13 +52,10 @@ def setupTurtle():
     turtle.setup(SCREEN_SIZE, SCREEN_SIZE)
     turtle.setworldcoordinates(0, SCREEN_SIZE + 10, SCREEN_SIZE + 10, 0)
     screen = turtle.Screen()
-    screen.register_shape("blob.gif")
     screen.delay(0)
     screen.bgcolor("black")
 
     return turtle.Turtle()
-    # t.shape("blob.gif")
-    # screen.mainloop()
 
 
 def drawGrid(turt, N, color):
@@ -132,12 +129,25 @@ def higlightGridSquare(turt, N, xcoord, ycoord, color):
     turt.goto(gridlineIncrement * xcoord, gridlineIncrement * ycoord)
     turt.pendown()
     
-    turt.goto((2 * gridlineIncrement) * xcoord, gridlineIncrement * ycoord)
-    turt.goto((2 * gridlineIncrement) * xcoord, (2 * gridlineIncrement) * ycoord)
-    turt.goto(gridlineIncrement * xcoord, (2 * gridlineIncrement) * ycoord)
+    turt.goto((gridlineIncrement * xcoord) + gridlineIncrement, gridlineIncrement * ycoord)
+    turt.goto((gridlineIncrement * xcoord) + gridlineIncrement, (gridlineIncrement * ycoord) + gridlineIncrement)
+    turt.goto(gridlineIncrement * xcoord, (gridlineIncrement * ycoord) + gridlineIncrement)
     turt.goto(gridlineIncrement * xcoord, gridlineIncrement * ycoord)
 
     turt.color(originalColor[0])
+
+def colorizeCoverage(turt, N, matrix, paintstates, colorset):
+    turtoriginalspeed = turt.speed()
+    
+    for i in range(0, N):
+        for j in range (0, N):
+            if matrix[i][j] == 1 and paintstates[i][j] == 0:
+                higlightGridSquare(turt, N, i, j, colorset["painted"])
+                paintstates[i][j] = 1
+            elif matrix[i][j] == 0:
+                higlightGridSquare(turt, N, i, j, colorset["unpainted"])
+    
+    turt.speed(turtoriginalspeed)
 
 def verifyCoverage(matrix, N):
     for i in range(0, N):
@@ -148,11 +158,16 @@ def verifyCoverage(matrix, N):
 
 def createArt(turt, N, colorset):
     colored = [[0 for x in range(N)] for y in range(N)]
-    coloredCount = [[0 for x in range(N)] for y in range(N)]
+    paintstates = [[0 for x in range(N)] for y in range(N)]
+    coloredcount = [[0 for x in range(N)] for y in range(N)]
     
     while verifyCoverage(colored, N) == False:
         k = random.randint(1, N)
         j = random.randint(1, N)
+        
+        colorizeCoverage(turt, N, colored, paintstates, colorset)
+        paintstates[k - 1][j - 1] = 0
+        higlightGridSquare(turt, N, k - 1, j - 1, colorset["painting"])
         
         constraints = getGridCoordConstraints(turt, N, k, j)
         
@@ -173,13 +188,16 @@ def createArt(turt, N, colorset):
         turt.circle(radius)
         turt.end_fill()
         colored[k - 1][j - 1] = 1
-        coloredCount[k - 1][j - 1] = coloredCount[k - 1][j - 1] + 1
+        coloredcount[k - 1][j - 1] = coloredcount[k - 1][j - 1] + 1
+    
+    colorizeCoverage(turt, N, colored, paintstates, colorset)
+
 
 def startApp():
     
     colorset = {
         "unpainted":"#404040",
-        "painted":"#8c8c8c",
+        "painted":"black",
         "painting":"#ff00bf",
         "color1":"#ff5252",
         "color2":"#ff793f",
