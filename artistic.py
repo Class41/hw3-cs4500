@@ -183,7 +183,7 @@ def createArt(turt, N, colorset):
         turt.speed("fastest")
         turt.ht()
         
-        radius = int(SCREEN_SIZE / (N* random.randint(4,12)))
+        radius = int(SCREEN_SIZE / (N* random.randint(4,25)))
         
         xcord = random.randint(int(constraints[0]) + radius + 5, int(constraints[1]) - radius - 5)
         ycord = random.randint(int(constraints[2]) + 5, int(constraints[3]) - (2*radius) - 5)
