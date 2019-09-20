@@ -206,18 +206,44 @@ def createArt(turt, N, colorset):
 def gatherArtStatistics(resultset, results, N):
     cell_min = 99999
     cell_max = 0
-    cell_avg = 0
+    art_total = 0
     
     for i in range(0, N):
         for j in range (0, N):
-            cell_avg = cell_avg = results[i][j]
+            art_total = art_total + results[i][j]
             if results[i][j] < cell_min:
                 cell_min = results[i][j]
             if results[i][j] > cell_min:
                 cell_max = results[i][j]
+        
+    resultset["art_avg"] = resultset["art_avg"] + art_total
     
-    cell_avg = cell_avg / (N * N)
+    if resultset["art_min"] > art_total:
+        resultset["art_min"] = art_total
+    if resultset["art_max"] < art_total:
+        resultset["art_max"] = art_total
+    
+    resultset["cell_avg"] = resultset["cell_avg"] + art_total
+    
+    if resultset["cell_min"] > cell_min:
+        resultset["cell_min"] = cell_min
+    if resultset["cell_max"] < cell_max:
+        resultset["cell_max"] = cell_max
+        
+    return resultset
 
+def finalizeAndDisplayResults(resultset, N, numpaintings):
+    resultset["cell_avg"] = resultset["cell_avg"] / (N*N*numpaintings)
+    resultset["art_avg"] = resultset["art_avg"] / numpaintings
+    
+    print("Min blobs to complete a piece of art: " + str(resultset["art_min"]))
+    print("Max blobs to complete a piece of art: " + str(resultset["art_max"]))
+    print("Avg blobs to complete a piece of art: " + str(resultset["art_avg"]))
+    print("\n\nMin blobs in a cell: " + str(resultset["cell_min"]))
+    print("Max blobs in a cell: " + str(resultset["cell_max"]))
+    print("Avg blobs in a cell: " + str(resultset["cell_avg"]))
+
+    
 def startApp():
     
     colorset = {
@@ -247,6 +273,8 @@ def startApp():
         results = createArt(turt, N, colorset)
         resultset = gatherArtStatistics(resultset, results, N)
         input()
+    
+    finalizeAndDisplayResults(resultset, N, numPaintings)
 
 
 if __name__ == "__main__":
