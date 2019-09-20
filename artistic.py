@@ -183,7 +183,7 @@ def createArt(turt, N, colorset):
         turt.speed("fastest")
         turt.ht()
         
-        radius = int(SCREEN_SIZE / (N*5))
+        radius = int(SCREEN_SIZE / (N* random.randint(4,12)))
         
         xcord = random.randint(int(constraints[0]) + radius + 5, int(constraints[1]) - radius - 5)
         ycord = random.randint(int(constraints[2]) + 5, int(constraints[3]) - (2*radius) - 5)
@@ -208,12 +208,15 @@ def gatherArtStatistics(resultset, results, N):
     cell_max = 0
     art_total = 0
     
+    #print(str(results).replace("],", "]\n", -1))
+    
     for i in range(0, N):
         for j in range (0, N):
             art_total = art_total + results[i][j]
+            
             if results[i][j] < cell_min:
                 cell_min = results[i][j]
-            if results[i][j] > cell_min:
+            if results[i][j] > cell_max:
                 cell_max = results[i][j]
         
     resultset["art_avg"] = resultset["art_avg"] + art_total
@@ -256,10 +259,10 @@ def startApp():
     }
     
     resultset = {
-        "art_min":0,
+        "art_min":99999,
         "art_max": 0,
         "art_avg": 0,
-        "cell_min": 0,
+        "cell_min": 99999,
         "cell_max": 0,
         "cell_avg": 0
     }
