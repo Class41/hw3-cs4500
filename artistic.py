@@ -54,14 +54,17 @@ def setupTurtle():
     screen = turtle.Screen()
     screen.register_shape("blob.gif")
     screen.delay(0)
+    screen.bgcolor("black")
 
     return turtle.Turtle()
     # t.shape("blob.gif")
     # screen.mainloop()
 
 
-def drawGrid(turt, N):
+def drawGrid(turt, N, color):
     turt.speed("fast")
+
+    turt.color(color)
 
     gridlineIncrement = SCREEN_SIZE / N
     turt.goto(SCREEN_SIZE, 0)
@@ -156,10 +159,10 @@ def createArt(turt, N, colorset):
         turt.speed("fastest")
         turt.ht()
         
-        radius = int(SCREEN_SIZE / (N*6))
+        radius = int(SCREEN_SIZE / (N*5))
         
-        xcord = random.randint(int(constraints[0]) + radius, int(constraints[1]) - radius)
-        ycord = random.randint(int(constraints[2]), int(constraints[3]) - (2*radius))
+        xcord = random.randint(int(constraints[0]) + radius + 5, int(constraints[1]) - radius - 5)
+        ycord = random.randint(int(constraints[2]) + 5, int(constraints[3]) - (2*radius) - 5)
         
         turt.color(list(colorset.values())[3 + random.randint(0, 2)])
         
@@ -175,18 +178,18 @@ def createArt(turt, N, colorset):
 def startApp():
     
     colorset = {
-        "unpainted":"#ff0000",
-        "painted":"#000000",
+        "unpainted":"#404040",
+        "painted":"#8c8c8c",
         "painting":"#ff00bf",
-        "color1":"#42b0ff",
-        "color2":"#adddff",
-        "color3":"#2b77ad"
+        "color1":"#ff5252",
+        "color2":"#ff793f",
+        "color3":"#ffb142"
     }
     
     N = getDimensions()
     numPaintings = getNumPaintings()
     turt = setupTurtle()
-    drawGrid(turt, N)
+    drawGrid(turt, N, colorset["unpainted"])
     createArt(turt, N, colorset)
 
     input()
