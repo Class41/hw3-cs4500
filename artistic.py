@@ -52,7 +52,7 @@ def setupTurtle():
     turtle.setup(SCREEN_SIZE, SCREEN_SIZE)
     turtle.setworldcoordinates(0, SCREEN_SIZE + 10, SCREEN_SIZE + 10, 0)
     screen = turtle.Screen()
-    screen.delay(30)
+    screen.delay(0)
     screen.bgcolor("black")
 
     return turtle.Turtle()
@@ -180,8 +180,8 @@ def createArt(turt, N, colorset):
 
         constraints = getGridCoordConstraints(turt, N, k, j)
         
-        turt.speed("fast")
-        #turt.ht()
+        turt.speed("fastest")
+        turt.ht()
         
         radius = int(SCREEN_SIZE / (N*5))
         
