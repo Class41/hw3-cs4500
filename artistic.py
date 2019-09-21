@@ -58,21 +58,26 @@ many times.
 import turtle
 import random
 
+# Sets the width/height of the window that is drawn into WARNING: Aspect ratio
+# may be wonky
 SCREEN_SIZE = 500
 
 
+# Handles user input of grid size (N)
 def getDimensions():
     valid = False
     N = -1
 
     print("Please specify your grid-size")
 
-    while not valid:
+    while (
+        not valid
+    ):  # valid requires number to be in requested range and be parsable to a int
         N = input("Please enter an integer between 2 and 15 inclusive: ")
 
-        try:
+        try:  # if this passes, we know N is within range and is also parsable to an int
             N = int(N)
-            if N >= 2 and N <= 15:
+            if N >= 2 and N <= 15:  # bounds for input
                 valid = True
             else:
                 print("That is not in the allowed range. Try again.")
@@ -83,18 +88,21 @@ def getDimensions():
     return N
 
 
+# Handles user input of painting count (K)
 def getNumPaintings():
     valid = False
     N = -1
 
     print("Select a number of paintings to be completed by ze artist")
 
-    while not valid:
+    while (
+        not valid
+    ):  # valid requires number to be in requested range and be parsable to a int
         N = input("Please enter an integer between 1 and 10 inclusive: ")
 
-        try:
+        try:  # if this passes, we know N is within range and is also parsable to an int
             N = int(N)
-            if N >= 1 and N <= 10:
+            if N >= 1 and N <= 10:  # bounds for input
                 valid = True
             else:
                 print("That is not in the allowed range. Try again.")
@@ -105,27 +113,36 @@ def getNumPaintings():
     return N
 
 
+# Setup the screen size/speed for the turtle, reset origin, and returns the
+# turtle
 def setupTurtle():
-    turtle.setup(SCREEN_SIZE, SCREEN_SIZE)
-    turtle.setworldcoordinates(0, SCREEN_SIZE + 10, SCREEN_SIZE + 10, 0)
-    screen = turtle.Screen()
-    screen.delay(0)
+    turtle.setup(SCREEN_SIZE, SCREEN_SIZE)  # setup play area
+    turtle.setworldcoordinates(
+        0, SCREEN_SIZE + 10, SCREEN_SIZE + 10, 0
+    )  # reset origin for turtle
+    screen = turtle.Screen()  # create new screen instance
+    screen.delay(0)  # don't spend time drawing, it takes too long!
     screen.reset()
     screen.bgcolor("black")
 
     return turtle.Turtle()
 
 
+# Draws a grid of N x N in color color using turtle turt
 def drawGrid(turt, N, color):
     turt.speed("fast")
     turt.color(color)
 
-    gridlineIncrement = SCREEN_SIZE / N
+    gridlineIncrement = SCREEN_SIZE / N  # Calculates spacing between gridlines
+
+    # This section draws the outer outline of the grid
     turt.goto(SCREEN_SIZE, 0)
     turt.goto(SCREEN_SIZE, SCREEN_SIZE)
     turt.goto(0, SCREEN_SIZE)
     turt.goto(0, 0)
 
+    # Efficiently draw vertical lines, alternating up/down to minimize travel
+    # time
     for i in range(1, N):
         turt.penup()
         if i % 2 == 1:
@@ -137,6 +154,8 @@ def drawGrid(turt, N, color):
             turt.pendown()
             turt.goto(gridlineIncrement * i, 0)
 
+    # Efficiently draw horizontal lines, alternating left/right to minimize
+    # travel time
     for i in range(1, N):
         turt.penup()
         if i % 2 == 1:
@@ -148,12 +167,14 @@ def drawGrid(turt, N, color):
             turt.pendown()
             turt.goto(0, gridlineIncrement * i)
 
+    # Return turtle to origin
     turt.penup()
     turt.goto(0, 0)
     turt.pendown()
     turt.speed("normal")
 
 
+# Calculates and goes to a grid cell center
 def gotoGridCoordCenter(turt, N, xcoord, ycoord):
     gridlineIncrement = SCREEN_SIZE / N
     turt.penup()
@@ -164,11 +185,18 @@ def gotoGridCoordCenter(turt, N, xcoord, ycoord):
     turt.pendown()
 
 
+# Calculates the bounding box of a grid cell and returns a list of mins/maxes
 def getGridCoordConstraints(turt, N, xcoord, ycoord):
     gridlineIncrement = SCREEN_SIZE / N
-    xcenter = (gridlineIncrement * xcoord) - (gridlineIncrement / 2)
-    ycenter = (gridlineIncrement * ycoord) - (gridlineIncrement / 2)
+    xcenter = (gridlineIncrement * xcoord) - (
+        gridlineIncrement / 2
+    )  # Calculate center x
+    ycenter = (gridlineIncrement * ycoord) - (
+        gridlineIncrement / 2
+    )  # Calculate center y
 
+    # Starting at the center, add a 1/2 increment of the gridline in each
+    # direction
     xmin = int(xcenter - (gridlineIncrement / 2))
     xmax = int(xcenter + (gridlineIncrement / 2))
     ymin = int(ycenter - (gridlineIncrement / 2))
@@ -177,16 +205,20 @@ def getGridCoordConstraints(turt, N, xcoord, ycoord):
     return [xmin, xmax, ymin, ymax]
 
 
+# Outlines a cell at xcoord ycoord in color color using turtle turt
 def higlightGridSquare(turt, N, xcoord, ycoord, color):
     gridlineIncrement = SCREEN_SIZE / N
 
-    originalColor = turt.color()
+    originalColor = turt.color()  # Save incoming turtle color
 
     turt.color(color)
     turt.penup()
-    turt.goto(gridlineIncrement * xcoord, gridlineIncrement * ycoord)
+    turt.goto(
+        gridlineIncrement * xcoord, gridlineIncrement * ycoord
+    )  # Goes to top left corner of cell outline
     turt.pendown()
 
+    # This section traces around the grid cell
     turt.goto(
         (gridlineIncrement * xcoord) + gridlineIncrement, gridlineIncrement * ycoord
     )
@@ -199,42 +231,47 @@ def higlightGridSquare(turt, N, xcoord, ycoord, color):
     )
     turt.goto(gridlineIncrement * xcoord, gridlineIncrement * ycoord)
 
-    turt.color(originalColor[0])
+    turt.color(originalColor[0])  # Return the turtle back to the color it came in as
 
-
+#Loops through the 2D array containing colored/uncolored flags and colors or
+#re-draws cell outlines as needed depending on the painstates 2D array. This is
+#required due to redrawing the entire grid takes too long! This is for
+#efficiency. We only redraw potentially affected cells
 def colorizeCoverage(turt, N, matrix, paintstates, colorset):
     for i in range(0, N):
         for j in range(0, N):
-            if matrix[i][j] == 1 and paintstates[i][j] == 2:
+            if matrix[i][j] == 1 and paintstates[i][j] == 2: #Executes if cell is flagged for redraw, and the cell is filled with blob(s)
                 paintstates[i][j] = 1
-            if matrix[i][j] == 0 and paintstates[i][j] == 2:
+            if matrix[i][j] == 0 and paintstates[i][j] == 2: #Executes if flagged and unpainted cell
                 higlightGridSquare(turt, N, i, j, colorset["unpainted"])
                 paintstates[i][j] = 0
 
-
+#Checks the current grid state to make sure all cells have at least one blob
 def verifyCoverage(matrix, N):
     for i in range(0, N):
         for j in range(0, N):
             if matrix[i][j] == 0:
-                return False
+                return False #If there is at least one that has zero blobs, we don't care about the rest
     return True
 
-
+#For efficiency reasons, flags a + pattern around the updated cell at xcoord
+#ycoord for redraw
 def updateMatrixCross(N, paintstates, xcoord, ycoord):
-    paintstates[xcoord][ycoord] = 1
+    paintstates[xcoord][ycoord] = 1 #Flag self as painted
 
-    if xcoord + 1 < N:
+    if xcoord + 1 < N: #Right of +
         paintstates[xcoord + 1][ycoord] = 2
-    if ycoord + 1 < N:
+    if ycoord + 1 < N: #Top of +
         paintstates[xcoord][ycoord + 1] = 2
-    if xcoord - 1 >= 0:
+    if xcoord - 1 >= 0: #Left of +
         paintstates[xcoord - 1][ycoord] = 2
-    if ycoord - 1 >= 0:
+    if ycoord - 1 >= 0: #Bottom of +
         paintstates[xcoord][ycoord - 1] = 2
 
     return paintstates
 
-
+#Handles keeping track of painted cells, and issuing paint calls to cells from
+#random number generation
 def createArt(turt, N, colorset):
     colored = [[0 for x in range(N)] for y in range(N)]
     paintstates = [[0 for x in range(N)] for y in range(N)]
