@@ -233,65 +233,95 @@ def higlightGridSquare(turt, N, xcoord, ycoord, color):
 
     turt.color(originalColor[0])  # Return the turtle back to the color it came in as
 
-#Loops through the 2D array containing colored/uncolored flags and colors or
-#re-draws cell outlines as needed depending on the painstates 2D array. This is
-#required due to redrawing the entire grid takes too long! This is for
-#efficiency. We only redraw potentially affected cells
+
+# Loops through the 2D array containing colored/uncolored flags and colors or
+# re-draws cell outlines as needed depending on the painstates 2D array. This is
+# required due to redrawing the entire grid takes too long! This is for
+# efficiency. We only redraw potentially affected cells
 def colorizeCoverage(turt, N, matrix, paintstates, colorset):
     for i in range(0, N):
         for j in range(0, N):
-            if matrix[i][j] == 1 and paintstates[i][j] == 2: #Executes if cell is flagged for redraw, and the cell is filled with blob(s)
+            if (
+                matrix[i][j] == 1 and paintstates[i][j] == 2
+            ):  # Executes if cell is flagged for redraw, and the cell is filled with blob(s)
                 paintstates[i][j] = 1
-            if matrix[i][j] == 0 and paintstates[i][j] == 2: #Executes if flagged and unpainted cell
+            if (
+                matrix[i][j] == 0 and paintstates[i][j] == 2
+            ):  # Executes if flagged and unpainted cell
                 higlightGridSquare(turt, N, i, j, colorset["unpainted"])
                 paintstates[i][j] = 0
 
-#Checks the current grid state to make sure all cells have at least one blob
+
+# Checks the current grid state to make sure all cells have at least one blob
 def verifyCoverage(matrix, N):
     for i in range(0, N):
         for j in range(0, N):
             if matrix[i][j] == 0:
-                return False #If there is at least one that has zero blobs, we don't care about the rest
+                return (
+                    False
+                )  # If there is at least one that has zero blobs, we don't care about the rest
     return True
 
-#For efficiency reasons, flags a + pattern around the updated cell at xcoord
-#ycoord for redraw
-def updateMatrixCross(N, paintstates, xcoord, ycoord):
-    paintstates[xcoord][ycoord] = 1 #Flag self as painted
 
-    if xcoord + 1 < N: #Right of +
+# For efficiency reasons, flags a + pattern around the updated cell at xcoord
+# ycoord for redraw
+def updateMatrixCross(N, paintstates, xcoord, ycoord):
+    paintstates[xcoord][ycoord] = 1  # Flag self as painted
+
+    if xcoord + 1 < N:  # Right of +
         paintstates[xcoord + 1][ycoord] = 2
-    if ycoord + 1 < N: #Top of +
+    if ycoord + 1 < N:  # Top of +
         paintstates[xcoord][ycoord + 1] = 2
-    if xcoord - 1 >= 0: #Left of +
+    if xcoord - 1 >= 0:  # Left of +
         paintstates[xcoord - 1][ycoord] = 2
-    if ycoord - 1 >= 0: #Bottom of +
+    if ycoord - 1 >= 0:  # Bottom of +
         paintstates[xcoord][ycoord - 1] = 2
 
     return paintstates
 
-#Handles keeping track of painted cells, and issuing paint calls to cells from
-#random number generation
-def createArt(turt, N, colorset):
-    colored = [[0 for x in range(N)] for y in range(N)]
-    paintstates = [[0 for x in range(N)] for y in range(N)]
-    coloredcount = [[0 for x in range(N)] for y in range(N)]
 
-    while verifyCoverage(colored, N) == False:
+# Handles keeping track of painted cells, and issuing paint calls to cells from
+# random number generation
+def createArt(turt, N, colorset):
+    # 2D arrays
+    colored = [
+        [0 for x in range(N)] for y in range(N)
+    ]  # Stores 1 or 0 if cell painted or unpainted respectively
+    paintstates = [
+        [0 for x in range(N)] for y in range(N)
+    ]  # Used for algorithm optimization
+    coloredcount = [
+        [0 for x in range(N)] for y in range(N)
+    ]  # Stores statistical data for artwork
+
+    while (
+        verifyCoverage(colored, N) == False
+    ):  # While we still have cells that are unpainted
+        
+        # Select a random cell from the grid
         k = random.randint(1, N)
         j = random.randint(1, N)
 
-        colorizeCoverage(turt, N, colored, paintstates, colorset)
-        higlightGridSquare(turt, N, k - 1, j - 1, colorset["painting"])
-        paintstates = updateMatrixCross(N, paintstates, k - 1, j - 1)
+        colorizeCoverage(
+            turt, N, colored, paintstates, colorset
+        )  # Repaint the grid masked to flagged cells
+        higlightGridSquare(
+            turt, N, k - 1, j - 1, colorset["painting"]
+        )  # Highlight the square we are about to paint
+        paintstates = updateMatrixCross(N, paintstates, k - 1, j - 1)  # Set flags for +
 
-        constraints = getGridCoordConstraints(turt, N, k, j)
+        constraints = getGridCoordConstraints(
+            turt, N, k, j
+        )  # Get grid cell bounding box
 
-        turt.speed("fastest")
-        turt.ht()
+        turt.speed("fastest")  # GO HYPERDRIVE
+        turt.ht()  # The user doesn't need to see this madness, and also speeds up the drawing
 
-        radius = int(SCREEN_SIZE / (N * random.randint(4, 25)))
+        radius = int(
+            SCREEN_SIZE / (N * random.randint(4, 25))
+        )  # Generate random blob radius
 
+        # Select a random coord within the boundingbox of the selected cell
         xcord = random.randint(
             int(constraints[0]) + radius + 5, int(constraints[1]) - radius - 5
         )
@@ -299,22 +329,35 @@ def createArt(turt, N, colorset):
             int(constraints[2]) + 5, int(constraints[3]) - (2 * radius) - 5
         )
 
-        turt.color(list(colorset.values())[3 + random.randint(0, 2)])
+        turt.color(
+            list(colorset.values())[3 + random.randint(0, 2)]
+        )  # Select random color from the colorset
 
+        # This section goes to the selected coord and draws a filled circle of
+        # radius radius in color selected above
         turt.penup()
         turt.goto(xcord, ycord)
         turt.pendown()
         turt.begin_fill()
         turt.circle(radius)
         turt.end_fill()
-        colored[k - 1][j - 1] = 1
-        coloredcount[k - 1][j - 1] = coloredcount[k - 1][j - 1] + 1
-        higlightGridSquare(turt, N, k - 1, j - 1, colorset["painted"])
 
-    colorizeCoverage(turt, N, colored, paintstates, colorset)
+        # Update 2D arrays
+        colored[k - 1][j - 1] = 1  # Flag this cell as colored
+        coloredcount[k - 1][j - 1] = (
+            coloredcount[k - 1][j - 1] + 1
+        )  # Update statistics 2D array
+        higlightGridSquare(
+            turt, N, k - 1, j - 1, colorset["painted"]
+        )  # Remove outline on current cell
+
+    colorizeCoverage(
+        turt, N, colored, paintstates, colorset
+    )  # After art finishes, redraw the grid one last time
     return coloredcount
 
 
+# Modify overall statistics based on the results of the last piece of art
 def gatherArtStatistics(resultset, results, N):
     cell_min = 99999
     cell_max = 0
@@ -322,6 +365,7 @@ def gatherArtStatistics(resultset, results, N):
 
     # print(str(results).replace("],", "]\n", -1))
 
+    # Loop through the results from last art (blob counts)
     for i in range(0, N):
         for j in range(0, N):
             art_total = art_total + results[i][j]
@@ -333,6 +377,7 @@ def gatherArtStatistics(resultset, results, N):
 
     resultset["art_avg"] = resultset["art_avg"] + art_total
 
+    # Update overall art statistics
     if resultset["art_min"] > art_total:
         resultset["art_min"] = art_total
     if resultset["art_max"] < art_total:
@@ -340,6 +385,7 @@ def gatherArtStatistics(resultset, results, N):
 
     resultset["cell_avg"] = resultset["cell_avg"] + art_total
 
+    # Update overall cell statistics
     if resultset["cell_min"] > cell_min:
         resultset["cell_min"] = cell_min
     if resultset["cell_max"] < cell_max:
@@ -348,10 +394,14 @@ def gatherArtStatistics(resultset, results, N):
     return resultset
 
 
+# Performs average divisions and displays the resultset to the screen
 def finalizeAndDisplayResults(resultset, N, numpaintings):
-    resultset["cell_avg"] = resultset["cell_avg"] / (N * N * numpaintings)
-    resultset["art_avg"] = resultset["art_avg"] / numpaintings
+    resultset["cell_avg"] = resultset["cell_avg"] / (
+        N * N * numpaintings
+    )  # N*N Cells Numpaintings times
+    resultset["art_avg"] = resultset["art_avg"] / numpaintings  # Paintings blob average
 
+    # Print results to screen
     print("Min blobs to complete a piece of art: " + str(resultset["art_min"]))
     print("Max blobs to complete a piece of art: " + str(resultset["art_max"]))
     print("Avg blobs to complete a piece of art: " + str(resultset["art_avg"]))
@@ -360,9 +410,10 @@ def finalizeAndDisplayResults(resultset, N, numpaintings):
     print("Avg blobs in a cell: " + str(resultset["cell_avg"]))
 
 
+# Program entrypoint
 def startApp():
 
-    colorset = {
+    colorset = {  # Colors that are used for cell outlines and blob colors
         "unpainted": "#404040",
         "painted": "black",
         "painting": "#ff00bf",
@@ -371,7 +422,7 @@ def startApp():
         "color3": "#ffb142",
     }
 
-    resultset = {
+    resultset = {  # Contains the statistics data displayed at the end of loops
         "art_min": 99999,
         "art_max": 0,
         "art_avg": 0,
@@ -380,18 +431,24 @@ def startApp():
         "cell_avg": 0,
     }
 
+    # Gets user inputs
     N = getDimensions()
     numPaintings = getNumPaintings()
 
+    # Loops for each painting
     for i in range(0, numPaintings):
-        turt = setupTurtle()
-        drawGrid(turt, N, colorset["unpainted"])
-        results = createArt(turt, N, colorset)
-        resultset = gatherArtStatistics(resultset, results, N)
-        input("Push ENTER or RETURN to continue...")
+        turt = setupTurtle()  # Recreate the canvas
+        drawGrid(turt, N, colorset["unpainted"])  # Recreate the grid
 
-    finalizeAndDisplayResults(resultset, N, numPaintings)
+        results = createArt(turt, N, colorset)  # Create art and capture staistics
+        resultset = gatherArtStatistics(resultset, results, N)  # Update result set
+        input("Push ENTER or RETURN to continue...")  # Await user input
+
+    finalizeAndDisplayResults(
+        resultset, N, numPaintings
+    )  # After all paintings, display statistics
 
 
+# Capture entrypoint call
 if __name__ == "__main__":
     startApp()
