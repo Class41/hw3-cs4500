@@ -52,7 +52,7 @@ removed on the next cycle. The proccess of placing ink blobs on the N x N grid
 continues until the painting is complete--that is when no gray cells exist/all
 cells have a paint blob. At which point, the user can admire the painting and
 press ENTER or RETURN to continue onto the next artwork repeating the cycle K
-many times.
+many times. Afterwards, displays the overall statistics for the paintings.
 
 """
 import turtle
