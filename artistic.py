@@ -121,6 +121,7 @@ def setupTurtle():
         0, SCREEN_SIZE + 10, SCREEN_SIZE + 10, 0
     )  # reset origin for turtle
     screen = turtle.Screen()  # create new screen instance
+    turtle.tracer(0, 0)
     screen.delay(0)  # don't spend time drawing, it takes too long!
     screen.reset()
     screen.bgcolor("black")
@@ -313,12 +314,12 @@ def createArt(turt, N, colorset):
         constraints = getGridCoordConstraints(
             turt, N, k, j
         )  # Get grid cell bounding box
-
+        turtle.Screen().update()
         turt.speed("fastest")  # GO HYPERDRIVE
         turt.ht()  # The user doesn't need to see this madness, and also speeds up the drawing
 
         radius = int(
-            SCREEN_SIZE / (N * random.randint(4, 25))
+            SCREEN_SIZE / (N * random.randint(15, 25))
         )  # Generate random blob radius
 
         # Select a random coord within the boundingbox of the selected cell
@@ -335,12 +336,14 @@ def createArt(turt, N, colorset):
 
         # This section goes to the selected coord and draws a filled circle of
         # radius radius in color selected above
+        turtle.tracer(1, 1)
         turt.penup()
         turt.goto(xcord, ycord)
         turt.pendown()
         turt.begin_fill()
         turt.circle(radius)
         turt.end_fill()
+        turtle.tracer(0, 0)
 
         # Update 2D arrays
         colored[k - 1][j - 1] = 1  # Flag this cell as colored
@@ -350,6 +353,7 @@ def createArt(turt, N, colorset):
         higlightGridSquare(
             turt, N, k - 1, j - 1, colorset["painted"]
         )  # Remove outline on current cell
+        turtle.Screen().update()
 
     colorizeCoverage(
         turt, N, colored, paintstates, colorset
